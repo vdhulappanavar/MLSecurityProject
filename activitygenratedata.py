@@ -36,9 +36,9 @@ for i in range(1, 18):
                              names=["timestamp", "x", "y", "z"])
     watch_data = pd.read_csv(os.path.join("data", training_data_dir, user, "Samsung - back", "linearAccelDataM.txt"), header=None,
                              names=["timestamp", "x", "y", "z"])
-    # glass_data = generate_rolling_data(glass_data, "walking", "glass")
-    # phone_data = generate_rolling_data(phone_data, "walking", "phone")
-    # watch_data = generate_rolling_data(watch_data, "climbing", "watch")
+    glass_data = generate_rolling_data(glass_data, "walking", "glass")
+    phone_data = generate_rolling_data(phone_data, "walking", "phone")
+    watch_data = generate_rolling_data(watch_data, "climbing", "watch")
     # # Concatenate the rolling data for all devices
     # combined_data = pd.concat([glass_data, phone_data, watch_data])
     # # Save the rolling data to a CSV file

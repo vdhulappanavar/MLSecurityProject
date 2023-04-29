@@ -4,7 +4,7 @@ import pandas as pd
 import tensorflow as tf
 from tensorflow.keras import layers
 
-window_size = 100
+window_size = 176
 
 # Set the path to the directory containing the rolling data files
 rolling_data_dir = "RollingDataFinalTest"
@@ -12,14 +12,14 @@ rolling_data_dir = "RollingDataFinalTest"
 # Loop through the rolling data files for each user and concatenate the data
 X_list = []
 for i in range(1, 18):
-    user = f"User00{i}"
+    user = f"User{i}"
     glass_data = pd.read_csv(os.path.join(rolling_data_dir, f"{user}_Glass_rolling.csv"))
     phone_data = pd.read_csv(os.path.join(rolling_data_dir, f"{user}_Phone_rolling.csv"))
     watch_data = pd.read_csv(os.path.join(rolling_data_dir, f"{user}_Watch_rolling.csv"))
     # Combine the data into one DataFrame
     combined_data = pd.concat([glass_data, phone_data, watch_data], axis=1)
     # Get the rolling window data
-    X_user = np.stack((combined_data["x_window"], combined_data["y_window"], combined_data["z_window"]), axis=-1)
+    X_user = combined_data.values.reshape(-1, window_size, 3).astype('float32')
     X_list.append(X_user)
 
 # Concatenate the data for all users

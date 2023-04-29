@@ -10,17 +10,21 @@ window_size = 100
 rolling_data_dir = "RollingDataFinalTest"
 
 # Loop through the rolling data files for each user and concatenate the data
+# Loop through the rolling data files for each user and concatenate the data
 X_list = []
 for i in range(1, 18):
     user = f"User00{i}"
     glass_data = pd.read_csv(os.path.join(rolling_data_dir, f"{user}_Glass_rolling.csv"))
     phone_data = pd.read_csv(os.path.join(rolling_data_dir, f"{user}_Phone_rolling.csv"))
     watch_data = pd.read_csv(os.path.join(rolling_data_dir, f"{user}_Watch_rolling.csv"))
-    # Combine the data into one DataFrame
-    combined_data = pd.concat([glass_data, phone_data, watch_data], axis=1)
-    # Get the rolling window data
-    X_user = np.stack((combined_data["x_window"], combined_data["y_window"], combined_data["z_window"]), axis=-1)
+    # Combine the data into one DataFrame and select only the relevant columns
+    combined_data = pd.concat([glass_data["x_window"], glass_data["y_window"], glass_data["z_window"],
+                               phone_data["x_window"], phone_data["y_window"], phone_data["z_window"],
+                               watch_data["x_window"], watch_data["y_window"], watch_data["z_window"]], axis=1)
+    # Reshape the data to the desired shape
+    X_user = combined_data.values.reshape(-1, window_size, 3)
     X_list.append(X_user)
+
 
 # Concatenate the data for all users
 X = np.concatenate(X_list, axis=0)
