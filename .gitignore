@@ -1,0 +1,11 @@
+# Ignore the data directory
+/data
+
+# Ignore the RollingDataFinalTest directory
+/RollingDataFinalTest
+
+/dhulappanavar-MLSecurity-code-final/data
+/dhulappanavar-MLSecurity-code-final/RollingDataFinalTest
+
+# Ignore all zip files
+*.zip
