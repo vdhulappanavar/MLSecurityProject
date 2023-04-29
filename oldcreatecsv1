@@ -1,0 +1,47 @@
+
+import pandas as pd
+import numpy as np
+
+# Load the data into a pandas dataframe
+data = pd.read_csv('./data/Training _Data/User001/Glass/linearAccelData.txt', header=None, names=['timestamp', 'x', 'y', 'z'])
+
+# Convert the timestamp column to datetime format
+data['timestamp'] = pd.to_datetime(data['timestamp'], format='%Y-%m-%d %H:%M:%S:%f')
+
+# Define the window size and overlap
+window_size = pd.Timedelta('2 seconds')
+overlap = 0.5
+
+# Initialize the list to hold the features
+features = []
+
+# Loop through each person
+for person in range(17):
+    # Extract the data for the current person
+    person_data = data[data.index % 17 == person]
+
+    # Initialize the start and end indices for the sliding window
+    start_index = 0
+    end_index = int(window_size.total_seconds() * person_data['timestamp'].dt.freq)
+
+    # Loop through the data with the sliding window
+    while end_index <= len(person_data):
+        # Extract the current window of data
+        window = person_data.iloc[start_index:end_index, 1:]
+
+        # Compute the 24 features for this window
+        features.append([np.mean(window), np.std(window), np.min(window), np.max(window), np.percentile(window, 25),
+                          np.percentile(window, 50), np.percentile(window, 75)])
+
+        # Slide the window by the overlap fraction
+        start_index += int((1 - overlap) * window_size.total_seconds() * person_data['timestamp'].dt.freq)
+        end_index += int((1 - overlap) * window_size.total_seconds() * person_data['timestamp'].dt.freq)
+
+# Convert the features list to a numpy array
+features = np.array(features)
+
+# Reshape the features array to have dimensions (num_samples, num_features, num_people)
+features = np.reshape(features, (-1, 24, 17))
+
+# Print the first 10 samples for the first person
+print(features[:10, :, 0])

@@ -1,0 +1,43 @@
+import numpy as np
+
+# Define window size and stride
+window_size = 100  # 2-second window size (assuming 50 Hz sampling rate)
+stride = 50  # 1-second stride (50% overlap between windows)
+
+# Initialize empty feature array
+num_features = 24  # 12 features for each of the x, y, and z axes
+num_windows = int(np.ceil((num_samples - window_size) / stride))  # Calculate number of windows per person
+features = np.zeros((num_windows * num_people, num_features))
+
+# Iterate over people
+for i in range(num_people):
+    person_data = accel_data[:, :, i]  # Get accelerometer data for current person
+    num_samples = person_data.shape[0]
+    
+    # Iterate over windows
+    for j in range(num_windows):
+        start = j * stride
+        end = start + window_size
+        window_data = person_data[start:end, :]  # Get data for current window
+        
+        # Compute features for x, y, and z axes
+        x_mean = np.mean(window_data[:, 0])
+        y_mean = np.mean(window_data[:, 1])
+        z_mean = np.mean(window_data[:, 2])
+        x_std = np.std(window_data[:, 0])
+        y_std = np.std(window_data[:, 1])
+        z_std = np.std(window_data[:, 2])
+        x_energy = np.sum(window_data[:, 0] ** 2)
+        y_energy = np.sum(window_data[:, 1] ** 2)
+        z_energy = np.sum(window_data[:, 2] ** 2)
+        x_entropy = -np.sum(window_data[:, 0] ** 2 * np.log(window_data[:, 0] ** 2))
+        y_entropy = -np.sum(window_data[:, 1] ** 2 * np.log(window_data[:, 1] ** 2))
+        z_entropy = -np.sum(window_data[:, 2] ** 2 * np.log(window_data[:, 2] ** 2))
+        x_corr = np.corrcoef(window_data[:, 0], window_data[:, 1])[0, 1]
+        y_corr = np.corrcoef(window_data[:, 1], window_data[:, 2])[0, 1]
+        z_corr = np.corrcoef(window_data[:, 2], window_data[:, 0])[0, 1]
+        
+        # Append features to feature array
+        features[j + i * num_windows, :] = [x_mean, x_std, x_energy, x_entropy, x_corr,
+                                             y_mean, y_std, y_energy, y_entropy, y_corr,
+                                             z_mean, z_std, z_energy, z_entropy, z_corr]
